@@ -1,7 +1,9 @@
 require.paths.push("./lib");
+require.paths.unshift('express/lib');
+
 
 var port = process.env.PORT || 8001;
-var app = require("./lib/express").createServer();
+var app = require("express").createServer();
 
 app.get('/', function(req, res) { 
 	res.sendfile("./public/index.html");

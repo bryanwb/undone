@@ -1,4 +1,4 @@
-require.paths.push("./lib");
+//require.paths.push("./lib");
 //require.paths.unshift('express');
 
 

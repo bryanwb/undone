@@ -3,6 +3,12 @@
 
 require.paths.unshift("vendor/lib");
 
+//test paths to make sure they work
+var connect = require('connect');
+var express = require('express');
+
+
+
 // require express and others to make sure
 var port = process.env.PORT || 8001;
 var app = require("express").createServer();

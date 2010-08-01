@@ -1,4 +1,13 @@
-require.paths.push("./lib");
+var http = require('http'),
+port = process.env.PORT || 8001;
+
+http.createServer(function (req, res) {
+	res.writeHead(200, {'Content-Type': 'text/plain'});
+	res.end('Hello World\n');
+  }).listen(parseInt(port));
+
+
+/*require.paths.push("./lib");
 require.paths.unshift('express/lib');
 
 
@@ -20,3 +29,4 @@ app.get('/newproject', function(req, res) {
 
 
 app.listen(port);
+*/

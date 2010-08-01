@@ -6,7 +6,7 @@ var port = process.env.PORT || 8001;
 var app = require("express").createServer();
 
 app.get('/', function(req, res) { 
-	res.sendfile("./public/index.html");
+	res.send("Hello heroku");
 });
 
 app.get('/login', function(req, res) { 

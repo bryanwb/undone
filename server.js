@@ -1,7 +1,7 @@
 //require.paths.push("./lib");
 //require.paths.unshift('express');
 
-
+require.paths.unshift(__dirname + "/lib");
 var port = process.env.PORT || 8001;
 var app = require("express").createServer();
 

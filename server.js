@@ -3,7 +3,7 @@
 
 require.paths.unshift("vendor/lib");
 
-//test paths to make sure they work
+	//test paths to make sure they work
 var connect = require('connect');
 var express = require('express');
 

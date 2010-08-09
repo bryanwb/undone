@@ -1,0 +1,23 @@
+<html> 
+    <head>
+    <title>Welcome to UNDone</title>
+    <script src="js/jquery-1.4.2.min.js"></script>
+
+    </head>
+    <body>
+    <form action='login' method='get'>
+    <% if (user){ %>
+    <div> Welcome <%- user.name %> </div>
+    <a href="/signout">Sign Out</a>
+    <% } else { %>
+    <div>Login</div>
+    Username:<input name="username" type="text" /> 
+    Password:<input name="password" type="password" />
+    <input type='submit' value='Log In' />
+    </form>
+    <div>Don't have an account yet?<a href="./newuser">Sign Up</a></div>
+    <% } %>
+
+    </body> 
+</html> 
+

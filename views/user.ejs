@@ -1,0 +1,34 @@
+<html> 
+    <head>
+    <title>Your Account at UNDone</title>
+    <script src="/js/jquery-1.4.2.min.js"></script>
+    <script src="/js/user.js"></script>
+    </head>
+    <body>
+    <form action='login' method='get'>
+    <% if (user){ %>
+    <div> Welcome <%- user %> </div>
+    <a href="/signout">Sign Out</a>
+    <div>Your Details</div>
+    <ul>
+    <li>
+      First Name : <input id="firstName" name="firstName" type="text" value=<%- firstName %>
+			  disabled="disabled"> </input>    
+    </li>
+    <li>
+      Last Name : <input id="lastName" name="lastName" type="text" value=<%- lastName %>
+			  disabled="disabled"> </input>
+    </li>
+    <li>
+      Username:<input name="username" type="text" value=<%- username %>
+			  disabled="disabled"> </input> 
+    </li>
+    </ul>
+    <input id="buttonEdit" type='submit' value='Edit' />
+    </form>
+    <% } else { %>
+
+    You have not created and account yet, please <a href="/signup">sign up</a>
+    <%  }    %>
+    </body> 
+</html> 

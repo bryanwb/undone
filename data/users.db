@@ -1,2 +1,2 @@
-{"name":"bwb","password":"foo"}	{"key":"bwb"}
+{"name":"bwb","password":"foo","firstName":"Bryan","lastName":"Berry"}	{"key":"bwb"}
 {"name":"creationix","password":"foo"}	{"key":"creationix"}

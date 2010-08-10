@@ -1,0 +1,25 @@
+<html> 
+    <head>
+    <title>Sign Up to UNDone</title>
+    </head>
+    <body>
+    <form action='login' method='get'>
+    <% if (!user){ %>
+    <div> Welcome <%- user %> </div>
+    <a href="/signout">Sign Out</a>
+    <% } else { %>
+    <div>Login</div>
+    First Name <input name="firstName" type="text" /> 
+    Last Name <input name="lastName" type="text" /> 
+    <input name="username" type="text" /> 		  
+    Username:<input name="username" type="text" /> 
+    Password:<input name="password" type="password" />
+    Repeat Password:<input name="repeatPassword" type="password" />		
+    <input type='submit' value='Log In' />
+    </form>
+    <% } else {%>
+
+    You have have already signed up, <a href="/signout">sign out</a>
+    <%  }    *>
+    </body> 
+</html> 

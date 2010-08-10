@@ -5,7 +5,9 @@ module.exports= function(options) {
   var my= {}; 
   that.name     = options.name || "someName";
   that.authenticate= function(request, response, callback) {
-    this.success( {id:'1', name:'someUser'}, callback );
+      sys.print('inside authenticate!');
+      sys.print(sys.inspect(this.success));
+      this.success( {id:'1', name:'someUser'}, callback);
   }
   return that;
 };  

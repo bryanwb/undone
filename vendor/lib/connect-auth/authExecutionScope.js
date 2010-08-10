@@ -1,19 +1,23 @@
-/*!
+/*
+
  * Copyright(c) 2010 Ciaran Jessup <ciaranj@gmai.com>
  * MIT Licensed
  */
-sys.puts('foo');
+
 var NONCE_CHARS= ['a','b','c','d','e','f','g','h','i','j','k','l','m','n',
                'o','p','q','r','s','t','u','v','w','x','y','z','A','B',
                'C','D','E','F','G','H','I','J','K','L','M','N','O','P',
                'Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3',
                '4','5','6','7','8','9'];
+
+var sys = require('sys');
                
 AuthExecutionScope= module.exports = function() {
   this.executionResult= { authenticated: false };
 }
 AuthExecutionScope.prototype.fail= function(callback) { callback(); }                                   
 AuthExecutionScope.prototype.success= function(user, callback) {
+  sys.puts('inside success');
   this.executionResult.user= user;
   this.halt(callback);
 };
@@ -22,7 +26,8 @@ AuthExecutionScope.prototype.halt= function(callback) {
   this.pass(callback);
 };
 AuthExecutionScope.prototype.pass= function(callback) {
-  callback();
+    sys.puts('inside pass');
+    callback({}, true);
 };
 
 AuthExecutionScope.prototype._getNonce= function(nonceSize) {

@@ -5,7 +5,7 @@ require.paths.unshift("vendor/lib");
 var connect = require('connect');
 var express = require('express');
 var nstore = require('nstore');
-var users = nstore('./data/users1.db');
+var users = nstore('./data/users.db');
 var sys = require('sys');
 
 
@@ -28,11 +28,11 @@ app.get('/', function(req, res) {
 app.get('/login', function (req, res) {
 
 	function authenticate (username, password, callback) {
-	    users.get("creationix",
+	    users.get("bwb",
 		       function (err, doc, meta){
 			   if(!err){
 			       ; //do something
-			   }
+				       }
 			   sys.print(sys.inspect(doc));
 			   req.session.user = doc.name;    
 			   req.session.authenticated = true;	   

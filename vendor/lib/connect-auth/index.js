@@ -6,10 +6,8 @@
 /** 
  * Module dependencies.
  */
-
 var connect= require('connect');
 var fs= require('fs');
-
 var StrategyExecutor= require('./strategyExecutor');
 
 /**
@@ -35,10 +33,10 @@ Auth= module.exports = function(optionsOrStrategy) {
   }
   var isAuthenticated = function( request, scope ) {
     if( scope === undefined ) {
-      return request.session.auth.user !== undefined;
+      return request.getAuthDetails().user !== undefined;
     }
     else {
-      return request.session.auth.scopedUsers[scope].user= undefined;
+      return request.getAuthDetails().scopedUsers[scope].user= undefined;
     }
   };     
   
@@ -49,16 +47,6 @@ Auth= module.exports = function(optionsOrStrategy) {
   var server=  connect.createServer(  
     function auth(req, res, next) {
       if( req.session ) {
-        // Create the auth holder
-        if( ! req.session.auth ) { 
-          var auth= { user: undefined };
-          req.session.auth= auth; 
-          //TODO: move this to a prototype or somesuch
-          req.session.scope= function(scope) {
-            return auth.scopedUsers[scope];
-          };
-        }
-
         // Setup the utility methods
         req.authenticate = function(strategy, opts, callback) {
           var strategy, opts, callback;
@@ -98,15 +86,18 @@ Auth= module.exports = function(optionsOrStrategy) {
               if( !executionResult.user ) callback(null,false)
               else {
                 if( scope === undefined) {
-                 req.session.auth.user= executionResult.user;
+                 req.getAuthDetails().user= executionResult.user;
                 }
                 else {
-                  req.session.auth.scopedUsers[scope].user=  executionResult.user;
+                  req.getAuthDetails().scopedUsers[scope].user=  executionResult.user;
                 }              
                 callback(null, true)
               }
             }
           }); 
+        };
+        req.getAuthDetails= function() {
+          return req.session.auth;
         };
         req.isAuthenticated= function(scope) {
           return isAuthenticated( req, scope );
@@ -116,12 +107,21 @@ Auth= module.exports = function(optionsOrStrategy) {
         };
         req.logout= function(scope) {
           if( scope === undefined) {
-           req.session.auth.user= undefined;
-           req.session.auth.scopedUsers= {};
+           req.getAuthDetails().user= undefined;
+           req.getAuthDetails().scopedUsers= {};
           }
           else {
-            req.session.auth.scopedUsers[scope].user= undefined;
+            req.getAuthDetails().scopedUsers[scope].user= undefined;
           }
+        }
+        // Create the auth holder
+        if( ! req.getAuthDetails() ) { 
+          var auth= { user: undefined };
+          req.session.auth= auth; 
+          //TODO: move this to a prototype or somesuch
+          req.session.scope= function(scope) {
+            return auth.scopedUsers[scope];
+          };
         }
       }
       next();
@@ -146,7 +146,7 @@ var STRATEGY_EXCLUSIONS= {"base.js" : true,
                           "base64.js" : true};
 
 function augmentAuthWithStrategy(filename, path) {
-  if (/\.js$/.test(filename) && !STRATEGY_EXCLUSIONS[filename]) {
+  if (/\.js$/.test(filename) && !STRATEGY_EXCLUSIONS[filename] && filename[0] != '_') {
       var name = filename.substr(0, filename.lastIndexOf('.'));
       var camelCaseName= name.charAt(0).toUpperCase() + name.substr(1).toLowerCase();
       Object.defineProperty(Auth, camelCaseName, { 
@@ -162,4 +162,7 @@ fs.readdirSync(__dirname + '/auth.strategies').forEach(function(filename){
 });
 fs.readdirSync(__dirname + '/auth.strategies/http').forEach(function(filename){
   augmentAuthWithStrategy(filename, '/auth.strategies/http')
+});
+fs.readdirSync(__dirname + '/auth.strategies/oauth').forEach(function(filename){
+  augmentAuthWithStrategy(filename, '/auth.strategies/oauth')
 });

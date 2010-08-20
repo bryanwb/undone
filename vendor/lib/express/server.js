@@ -31,6 +31,7 @@ var Server = exports = module.exports = function Server(middleware){
     this.redirects = {};
     this.viewHelpers = {};
     this.dynamicViewHelpers = {};
+    this.errorHandlers = [];
     connect.Server.call(this, middleware || []);
 
     // Default "home" to / 
@@ -70,6 +71,25 @@ var Server = exports = module.exports = function Server(middleware){
  */
 
 sys.inherits(Server, connect.Server);
+
+/**
+ * Stack error handler callbacks, then listen on the given
+ * `port` and `host`.
+ *
+ * @param {Number|String} port
+ * @param {String} host
+ * @return {Type}
+ * @api public
+ */
+
+Server.prototype.listen = function(){
+    this.errorHandlers.forEach(function(fn){
+        this.use(function(err, req, res, next){
+            fn.apply(this, arguments);
+        });
+    }, this);
+    connect.Server.prototype.listen.apply(this, arguments);
+};
 
 /**
  * Proxy `connect.Server#use()` to apply settings to
@@ -129,6 +149,18 @@ Server.prototype.mounted = function(fn){
 };
 
 /**
+ * See: view.register.
+ *
+ * @return {Server} for chaining
+ * @api public
+ */
+
+Server.prototype.register = function(){
+    view.register.apply(this, arguments);
+    return this;
+};
+
+/**
  * Register the given view helpers `obj`. This method
  * can be called several times to apply additional helpers.
  *
@@ -158,6 +190,7 @@ Server.prototype.dynamicHelpers = function(obj){
 
 /**
  * Assign a custom exception handler callback `fn`.
+ * These handlers are always _last_ in the middleware stack.
  *
  * @param {Function} fn
  * @return {Server} for chaining
@@ -165,9 +198,7 @@ Server.prototype.dynamicHelpers = function(obj){
  */
 
 Server.prototype.error = function(fn){
-    this.use(function(err, req, res, next){
-        fn.apply(this, arguments);
-    });
+    this.errorHandlers.push(fn);
     return this;
 };
 

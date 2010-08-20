@@ -2,7 +2,6 @@
  * Copyright(c) 2010 Ciaran Jessup <ciaranj@gmai.com>
  * MIT Licensed
  */
-
 var AuthExecutionScope= require('./authExecutionScope');
 
 module.exports= function(strategies) {

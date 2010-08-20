@@ -12,17 +12,17 @@ var sys = require('sys');
 //require express and others to make sure
 var port = process.env.PORT || 3000;
 var app = express.createServer(
-	      connect.cookieDecoder(),
-	      connect.bodyDecoder(),
+	      express.cookieDecoder(),
+	      express.bodyDecoder(),
 	      connect.staticProvider(__dirname + '/public'),
-	      connect.session()
+	      express.session()
 	      );
 
 
 app.get('/', function(req, res) { 
 	var user;
-	if (req.sessionStore.cookie && req.sessionStore.cookie.user){
-	    user = req.sessionStore.cookie.user;
+	if (req.session && req.session.user){
+	    user = req.session.user;
 	}
 
 	res.render("index.ejs", 
@@ -30,7 +30,7 @@ app.get('/', function(req, res) {
 		       });
 });
 
-app.get('/login?', function (req, res) {
+app.post('/login?', function (req, res) {
 
 	function authenticate (username, password, callback) {
 	    users.all(function(doc, meta){
@@ -42,8 +42,7 @@ app.get('/login?', function (req, res) {
 			       res.writeHead(200, { 'Content-Type': 'text/plain' });
 			       res.end("Invalid credentials supplied");
 			   } else {
-			       req.sessionStore.cookie.user = docs[0]['name'];    
-			       // sys.puts(req.session.user.name);
+			       req.session.user = docs[0].name;    
 			       req.session.authenticated = true;	   
 			       res.redirect('/', 302);
 			   }
@@ -52,9 +51,9 @@ app.get('/login?', function (req, res) {
 	};
 	
 
-	if (req.query.username && req.query.password){
-	    var username = req.query.username,
-	    password = req.query.password;
+	if (req.body.username && req.body.password){
+	    var username = req.body.username,
+	    password = req.body.password;
 	    authenticate(username, password);
 	} else {
 	    res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -64,14 +63,21 @@ app.get('/login?', function (req, res) {
 });
 
 app.get('/signout', function(req, res) {
-	req.sessionStore.cookie.user = undefined;
-	res.redirect("/", 302);
+	    req.session.regenerate(function(err){
+		    if(err){
+			sys.puts("ERROR: couldn't destroy your session");
+		    }else {
+			res.redirect("/", 302);
+		    }
+});
+    
+	;
 });
 
 app.get('/users/:user', function(req, res) { 
 	var user;
 	if (req.sessionStore.cookie && req.sessionStore.cookie.user){
-	    user = req.sessionStore.cookie.user;
+	    user = req.session.user;
 	} 
 
 	if (user === req.params.user){
@@ -93,10 +99,12 @@ app.get('/users/:user', function(req, res) {
 
 app.get('/signup', function(req, res) { 
 	var user;
-	if (req.sessionStore.cookie && req.sessionStore.cookie.user){
-	    user = req.sessionStore.cookie.user;
+	if (req.session.user){
+	    user = req.session.user;
 	}
 
+	    //generate user id parseInt(Math.random()*5000, 10);
+            //remember to check if it first exists
 	res.render("./signup.ejs",{locals : {user: user}, layout: false});
 });
 

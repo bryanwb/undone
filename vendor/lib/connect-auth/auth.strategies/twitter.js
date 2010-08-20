@@ -41,7 +41,7 @@ Twitter= module.exports= function(options, server) {
     //todo: makw the call timeout ....
     var self= this;
     if( parsedUrl.query && parsedUrl.query.oauth_token && request.session.auth["twitter_oauth_token_secret"] ) {
-      my._oAuth.getOauthAccessToken(parsedUrl.query.oauth_token, request.session.auth["twitter_oauth_token_secret"],
+      my._oAuth.getOAuthAccessToken(parsedUrl.query.oauth_token, request.session.auth["twitter_oauth_token_secret"],
                               function( error, oauth_token, oauth_token_secret, additionalParameters ) {
                                 if( error ) callback(null);
                                 else {
@@ -62,9 +62,7 @@ Twitter= module.exports= function(options, server) {
           request.session['twitter_redirect_url']= request.url;
           request.session.auth["twitter_oauth_token_secret"]= oauth_token_secret;
           request.session.auth["twitter_oauth_token"]= oauth_token;
-          
-          response.writeHead(303, { 'Location': "http://twitter.com/oauth/authenticate?oauth_token=" + oauth_token });
-          response.end('');
+          self.redirect(response, "http://twitter.com/oauth/authenticate?oauth_token=" + oauth_token, callback);
         }
       });
     }

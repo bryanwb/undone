@@ -4,10 +4,11 @@ require.paths.unshift("vendor/lib");
 //test paths to make sure they work
 var connect = require('connect');
 var express = require('express');
+var auth = require('connect-auth');
 var nstore = require('nstore');
 var users = nstore('./data/users.db');
 var sys = require('sys');
-
+var authStrategy = require('./myFirstFormStrategy')({store: users});
 
 //require express and others to make sure
 var port = process.env.PORT || 3000;
@@ -31,36 +32,18 @@ app.get('/', function(req, res) {
 });
 
 app.post('/login?', function (req, res) {
-
-	function authenticate (username, password, callback) {
-	    users.all(function(doc, meta){
-			return doc.name === username &&
-			      doc.password === password;
-		      },
-		      function (err, docs, meta){
-			  if(docs.length === 0){
-			       res.writeHead(200, { 'Content-Type': 'text/plain' });
-			       res.end("Invalid credentials supplied");
-			   } else {
-			       req.session.user = docs[0].name;    
-			       req.session.authenticated = true;	   
-			       res.redirect('/', 302);
-			   }
-		       } 
-		     );
-	};
-	
-
-	if (req.body.username && req.body.password){
-	    var username = req.body.username,
-	    password = req.body.password;
-	    authenticate(username, password);
-	} else {
-	    res.writeHead(200, { 'Content-Type': 'text/plain' });
-	    res.end("You Must supply a username and password");
-	}       
-
+           
+	authStrategy.authenticate(req, res, 
+		    function(){
+			if(req.isAuthenticated())
+			    res.redirect('/', 302);
+                        else{
+			    res.writeHead(200, { 'Content-Type': 'text/plain' });
+			    res.end("Invalid credentials supplied");
+			}
+		    });				       
 });
+
 
 app.get('/signout', function(req, res) {
 	    req.session.regenerate(function(err){
